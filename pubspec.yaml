@@ -1,0 +1,27 @@
+name: attendance_app
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.1 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  googleapis: ^13.1.0
+  googleapis_auth: ^1.4.0
+  http: ^1.2.2
+  cupertino_icons: ^1.0.6
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/thinking-pillar-441005-c6-e5ceb66885c2.json
