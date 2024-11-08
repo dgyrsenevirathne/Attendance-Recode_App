@@ -4,15 +4,11 @@ import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth_io.dart';
 
 class GoogleSheetsService {
-  // Replace with your actual Google Sheets ID
   static const _spreadsheetId = '10EYFwTkxJ05Q0sGU0QHAf1a6hpuIzL3PpRON-uTJB0g';
-  // Replace with your actual sheet name (e.g., 'Sheet1')
   static const _sheetName = 'Sheet1';
-  // Path to your JSON key file
   static const _credentials =
       'assets/thinking-pillar-441005-c6-e5ceb66885c2.json';
 
-  // Get Sheets API client using service account credentials
   static Future<SheetsApi> _getSheetsApi() async {
     try {
       final credentials = await rootBundle.loadString(_credentials);
@@ -26,34 +22,54 @@ class GoogleSheetsService {
     }
   }
 
-  // Function to add an attendance record (check-in/check-out)
   static Future<void> addAttendanceRecord(
       String employeeNumber, String employeeName, String type) async {
     try {
       final sheetsApi = await _getSheetsApi();
-
-      // Get the current date and time
       final now = DateTime.now();
       final date = '${now.year}-${now.month}-${now.day}';
       final time = '${now.hour}:${now.minute}';
 
-      // Prepare the row data based on type ('in' or 'out')
-      final row = [
-        employeeNumber,
-        employeeName,
-        date,
-        type == 'in' ? time : '',
-        type == 'out' ? time : ''
-      ];
-
-      // Append the row to the Google Sheet (starting from row 2, adjusting for header)
-      await sheetsApi.spreadsheets.values.append(
-        ValueRange(values: [row]),
+      // Retrieve existing data to search for a matching row
+      final response = await sheetsApi.spreadsheets.values.get(
         _spreadsheetId,
-        '$_sheetName!A2', // Start inserting from row 2 (assuming row 1 is for headers)
-        valueInputOption:
-            'USER_ENTERED', // Use 'USER_ENTERED' to allow Google Sheets to interpret the data (e.g., date/time formats)
+        '$_sheetName!A2:E', // Adjust range as needed
       );
+
+      final rows = response.values ?? [];
+
+      // Check if there’s an existing row for this employee on the same date
+      int? rowIndex;
+      for (int i = 0; i < rows.length; i++) {
+        final row = rows[i];
+        if (row.length >= 3 && row[0] == employeeNumber && row[2] == date) {
+          rowIndex =
+              i + 2; // Add 2 to get actual Google Sheets row index (1-based)
+          break;
+        }
+      }
+
+      if (rowIndex != null) {
+        // Update the existing row's "out" time
+        final range = '$_sheetName!E$rowIndex';
+        await sheetsApi.spreadsheets.values.update(
+          ValueRange(values: [
+            [time]
+          ]),
+          _spreadsheetId,
+          range,
+          valueInputOption: 'USER_ENTERED',
+        );
+      } else {
+        // Append a new row with "in" time
+        final newRow = [employeeNumber, employeeName, date, time, ''];
+        await sheetsApi.spreadsheets.values.append(
+          ValueRange(values: [newRow]),
+          _spreadsheetId,
+          '$_sheetName!A2',
+          valueInputOption: 'USER_ENTERED',
+        );
+      }
     } catch (e) {
       throw Exception("Failed to add attendance record: $e");
     }
