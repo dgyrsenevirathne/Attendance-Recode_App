@@ -25,3 +25,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/thinking-pillar-441005-c6-e5ceb66885c2.json
+    - assets/images/logo.png
+    - assets/images/background.jpg
+

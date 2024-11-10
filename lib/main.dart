@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'google_sheets_service.dart'; // Import the GoogleSheetsService
+import 'google_sheets_service.dart';
+import 'splash_screen.dart';
 
 void main() {
   runApp(AttendanceApp());
@@ -9,14 +10,13 @@ class AttendanceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Remove the debug banner
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        scaffoldBackgroundColor:
-            Colors.grey[100], // Set a light background color
+        scaffoldBackgroundColor: Colors.grey[100],
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Colors.white.withOpacity(0.8), // Semi-transparent input
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
@@ -24,14 +24,18 @@ class AttendanceApp extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            minimumSize: Size(double.infinity, 50), // Full-width button
+            minimumSize: Size(double.infinity, 50),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
+            elevation: 5,
           ),
         ),
       ),
-      home: AttendanceHomePage(),
+      home: SplashScreen(),
+      routes: {
+        '/home': (context) => AttendanceHomePage(),
+      },
     );
   }
 }
@@ -90,45 +94,67 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Attendance Management'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _employeeNumberController,
-              decoration: InputDecoration(
-                labelText: 'Employee Number',
-                prefixIcon: Icon(Icons.badge),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+                'assets/images/background.jpg'), // Add your background image
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Welcome to Attendance Management',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 10,
+                      color: Colors.black26,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _employeeNameController,
-              decoration: InputDecoration(
-                labelText: 'Employee Name',
-                prefixIcon: Icon(Icons.person),
+              SizedBox(height: 24),
+              TextField(
+                controller: _employeeNumberController,
+                decoration: InputDecoration(
+                  labelText: 'Employee Number',
+                  prefixIcon: Icon(Icons.badge),
+                ),
               ),
-            ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: checkIn,
-              child: Text('Check In', style: TextStyle(fontSize: 18)),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: checkOut,
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red),
+              SizedBox(height: 16),
+              TextField(
+                controller: _employeeNameController,
+                decoration: InputDecoration(
+                  labelText: 'Employee Name',
+                  prefixIcon: Icon(Icons.person),
+                ),
               ),
-              child: Text('Check Out', style: TextStyle(fontSize: 18)),
-            ),
-          ],
+              SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: checkIn,
+                child: Text('Check In', style: TextStyle(fontSize: 18)),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: checkOut,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // Updated for Check-Out button
+                ),
+                child: Text('Check Out', style: TextStyle(fontSize: 18)),
+              ),
+            ],
+          ),
         ),
       ),
     );
