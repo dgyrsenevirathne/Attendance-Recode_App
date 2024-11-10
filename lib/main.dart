@@ -9,6 +9,28 @@ class AttendanceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // Remove the debug banner
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor:
+            Colors.grey[100], // Set a light background color
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            minimumSize: Size(double.infinity, 50), // Full-width button
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+      ),
       home: AttendanceHomePage(),
     );
   }
@@ -68,29 +90,43 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Attendance Management')),
+      appBar: AppBar(
+        title: Text('Attendance Management'),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               controller: _employeeNumberController,
-              decoration: InputDecoration(labelText: 'Employee Number'),
+              decoration: InputDecoration(
+                labelText: 'Employee Number',
+                prefixIcon: Icon(Icons.badge),
+              ),
             ),
+            SizedBox(height: 16),
             TextField(
               controller: _employeeNameController,
-              decoration: InputDecoration(labelText: 'Employee Name'),
+              decoration: InputDecoration(
+                labelText: 'Employee Name',
+                prefixIcon: Icon(Icons.person),
+              ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 24),
             ElevatedButton(
               onPressed: checkIn,
-              child: Text('Check In'),
+              child: Text('Check In', style: TextStyle(fontSize: 18)),
             ),
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: checkOut,
-              child: Text('Check Out'),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red),
+              ),
+              child: Text('Check Out', style: TextStyle(fontSize: 18)),
             ),
           ],
         ),
