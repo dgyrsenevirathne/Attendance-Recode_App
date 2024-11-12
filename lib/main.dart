@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'google_sheets_service.dart';
 import 'splash_screen.dart';
 
@@ -48,6 +49,22 @@ class AttendanceHomePage extends StatefulWidget {
 class _AttendanceHomePageState extends State<AttendanceHomePage> {
   final _employeeNumberController = TextEditingController();
   final _employeeNameController = TextEditingController();
+  final Location _location = Location();
+
+  // Method to get location
+  Future<Map<String, double>?> _getLocation() async {
+    try {
+      final locationData = await _location.getLocation();
+      return {
+        'latitude': locationData.latitude!,
+        'longitude': locationData.longitude!,
+      };
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to get location')));
+      return null;
+    }
+  }
 
   // Function to handle check-in
   void checkIn() async {
@@ -55,14 +72,17 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
     final employeeName = _employeeNameController.text;
 
     if (employeeNumber.isNotEmpty && employeeName.isNotEmpty) {
-      try {
-        await GoogleSheetsService.addAttendanceRecord(
-            employeeNumber, employeeName, 'in');
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Check-in recorded!')));
-      } catch (e) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to record check-in')));
+      final location = await _getLocation();
+      if (location != null) {
+        try {
+          await GoogleSheetsService.addAttendanceRecord(
+              employeeNumber, employeeName, 'in', location);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Check-in recorded!')));
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to record check-in')));
+        }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,14 +96,17 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
     final employeeName = _employeeNameController.text;
 
     if (employeeNumber.isNotEmpty && employeeName.isNotEmpty) {
-      try {
-        await GoogleSheetsService.addAttendanceRecord(
-            employeeNumber, employeeName, 'out');
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Check-out recorded!')));
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to record check-out')));
+      final location = await _getLocation();
+      if (location != null) {
+        try {
+          await GoogleSheetsService.addAttendanceRecord(
+              employeeNumber, employeeName, 'out', location);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Check-out recorded!')));
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to record check-out')));
+        }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

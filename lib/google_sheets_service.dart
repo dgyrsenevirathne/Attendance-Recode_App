@@ -22,18 +22,20 @@ class GoogleSheetsService {
     }
   }
 
-  static Future<void> addAttendanceRecord(
-      String employeeNumber, String employeeName, String type) async {
+  static Future<void> addAttendanceRecord(String employeeNumber,
+      String employeeName, String type, Map<String, double> location) async {
     try {
       final sheetsApi = await _getSheetsApi();
       final now = DateTime.now();
       final date = '${now.year}-${now.month}-${now.day}';
       final time = '${now.hour}:${now.minute}';
+      final latitude = location['latitude'];
+      final longitude = location['longitude'];
 
       // Retrieve existing data to search for a matching row
       final response = await sheetsApi.spreadsheets.values.get(
         _spreadsheetId,
-        '$_sheetName!A2:E', // Adjust range as needed
+        '$_sheetName!A2:F', // Adjust range as needed
       );
 
       final rows = response.values ?? [];
@@ -50,23 +52,30 @@ class GoogleSheetsService {
       }
 
       if (rowIndex != null) {
-        // Update the existing row's "out" time
-        final range = '$_sheetName!E$rowIndex';
+        // Update the existing row's "out" time and location
+        final range = '$_sheetName!E$rowIndex:F$rowIndex';
         await sheetsApi.spreadsheets.values.update(
           ValueRange(values: [
-            [time]
+            [time, '$latitude, $longitude']
           ]),
           _spreadsheetId,
           range,
           valueInputOption: 'USER_ENTERED',
         );
       } else {
-        // Append a new row with "in" time
-        final newRow = [employeeNumber, employeeName, date, time, ''];
+        // Append a new row with "in" time and location
+        final newRow = [
+          employeeNumber,
+          employeeName,
+          date,
+          time,
+          '',
+          '$latitude, $longitude'
+        ];
         await sheetsApi.spreadsheets.values.append(
           ValueRange(values: [newRow]),
           _spreadsheetId,
-          '$_sheetName!A2',
+          '$_sheetName!A:F',
           valueInputOption: 'USER_ENTERED',
         );
       }

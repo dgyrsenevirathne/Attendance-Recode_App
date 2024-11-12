@@ -14,6 +14,8 @@ dependencies:
   googleapis_auth: ^1.4.0
   http: ^1.2.2
   cupertino_icons: ^1.0.6
+  geolocator: ^9.0.0
+  location: ^4.4.0
 
 
 dev_dependencies:
@@ -27,4 +29,3 @@ flutter:
     - assets/thinking-pillar-441005-c6-e5ceb66885c2.json
     - assets/images/logo.png
     - assets/images/background.jpg
-
