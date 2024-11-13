@@ -51,6 +51,9 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
   final _employeeNameController = TextEditingController();
   final Location _location = Location();
 
+  final _numberRegExp = RegExp(r'^\d+$'); // Only numbers
+  final _nameRegExp = RegExp(r'^[a-zA-Z]+$'); // Only letters
+
   // Method to get location
   Future<Map<String, double>?> _getLocation() async {
     try {
@@ -68,50 +71,64 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
 
   // Function to handle check-in
   void checkIn() async {
+    if (!_validateInput()) return;
+
     final employeeNumber = _employeeNumberController.text;
     final employeeName = _employeeNameController.text;
 
-    if (employeeNumber.isNotEmpty && employeeName.isNotEmpty) {
-      final location = await _getLocation();
-      if (location != null) {
-        try {
-          await GoogleSheetsService.addAttendanceRecord(
-              employeeNumber, employeeName, 'in', location);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Check-in recorded!')));
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to record check-in')));
-        }
+    final location = await _getLocation();
+    if (location != null) {
+      try {
+        await GoogleSheetsService.addAttendanceRecord(
+            employeeNumber, employeeName, 'in', location);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Check-in recorded!')));
+      } catch (e) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to record check-in')));
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please enter employee details')));
     }
   }
 
   // Function to handle check-out
   void checkOut() async {
+    if (!_validateInput()) return;
+
     final employeeNumber = _employeeNumberController.text;
     final employeeName = _employeeNameController.text;
 
-    if (employeeNumber.isNotEmpty && employeeName.isNotEmpty) {
-      final location = await _getLocation();
-      if (location != null) {
-        try {
-          await GoogleSheetsService.addAttendanceRecord(
-              employeeNumber, employeeName, 'out', location);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Check-out recorded!')));
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to record check-out')));
-        }
+    final location = await _getLocation();
+    if (location != null) {
+      try {
+        await GoogleSheetsService.addAttendanceRecord(
+            employeeNumber, employeeName, 'out', location);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Check-out recorded!')));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to record check-out')));
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please enter employee details')));
     }
+  }
+
+  // Validate employee ID and name
+  bool _validateInput() {
+    final employeeNumber = _employeeNumberController.text;
+    final employeeName = _employeeNameController.text;
+
+    if (!_numberRegExp.hasMatch(employeeNumber)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Employee ID should contain only numbers')));
+      return false;
+    }
+
+    if (!_nameRegExp.hasMatch(employeeName)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Employee name should contain only letters')));
+      return false;
+    }
+
+    return true;
   }
 
   @override
@@ -166,13 +183,16 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: checkIn,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey, // Updated for Check-Out button
+                ),
                 child: Text('Check In', style: TextStyle(fontSize: 18)),
               ),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: checkOut,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // Updated for Check-Out button
+                  backgroundColor: Colors.blue, // Updated for Check-Out button
                 ),
                 child: Text('Check Out', style: TextStyle(fontSize: 18)),
               ),
