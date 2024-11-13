@@ -184,7 +184,7 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
               ElevatedButton(
                 onPressed: checkIn,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey, // Updated for Check-Out button
+                  backgroundColor: Colors.grey,
                 ),
                 child: Text('Check In', style: TextStyle(fontSize: 18)),
               ),
@@ -192,7 +192,7 @@ class _AttendanceHomePageState extends State<AttendanceHomePage> {
               ElevatedButton(
                 onPressed: checkOut,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Updated for Check-Out button
+                  backgroundColor: Colors.blue,
                 ),
                 child: Text('Check Out', style: TextStyle(fontSize: 18)),
               ),
